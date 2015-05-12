@@ -1,0 +1,7 @@
+c:\users\rbobi\documents\visual studio 2013\Projects\Greentube.Test.Console\Greentube.Test.ConsoleApp\bin\Debug\Greentube.Test.ConsoleApp.exe.config
+c:\users\rbobi\documents\visual studio 2013\Projects\Greentube.Test.Console\Greentube.Test.ConsoleApp\bin\Debug\Greentube.Test.ConsoleApp.exe
+c:\users\rbobi\documents\visual studio 2013\Projects\Greentube.Test.Console\Greentube.Test.ConsoleApp\bin\Debug\Greentube.Test.ConsoleApp.pdb
+c:\users\rbobi\documents\visual studio 2013\Projects\Greentube.Test.Console\Greentube.Test.ConsoleApp\obj\Debug\Greentube.Test.ConsoleApp.exe
+c:\users\rbobi\documents\visual studio 2013\Projects\Greentube.Test.Console\Greentube.Test.ConsoleApp\obj\Debug\Greentube.Test.ConsoleApp.pdb
+C:\Users\rbobi\documents\visual studio 2013\Projects\Greentube.Test.Console\Greentube.Test.ConsoleApp\obj\Debug\Greentube.Test.ConsoleApp.csprojResolveAssemblyReference.cache
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Greentube.Test.ConsoleApp\bin\Debug\Respawn.dll

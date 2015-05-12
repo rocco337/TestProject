@@ -1,0 +1,10 @@
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\bin\Debug\Akka.Bootcamp.Unit1.exe.config
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\bin\Debug\Akka.Bootcamp.Unit1.exe
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\bin\Debug\Akka.Bootcamp.Unit1.pdb
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\bin\Debug\Akka.dll
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\bin\Debug\Newtonsoft.Json.dll
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\bin\Debug\Akka.xml
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\bin\Debug\Newtonsoft.Json.xml
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\obj\Debug\Akka.Bootcamp.Unit1.exe
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\obj\Debug\Akka.Bootcamp.Unit1.pdb
+C:\Users\rbobi\Documents\Visual Studio 2013\Projects\Greentube.Test.Console\Akka.Bootcamp.Unit1\obj\Debug\Akka.Bootcamp.csprojResolveAssemblyReference.cache

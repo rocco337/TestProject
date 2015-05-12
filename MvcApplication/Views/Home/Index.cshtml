@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<form action="@Url.Action("Data")">
+    <select name="ids" multiple="multiple" id="ids">
+        <option value="1">Incoming</option>
+        <option value="2">Paid</option>
+        <option value="3">Deleted</option>
+        <option value="4">Chargeback</option>
+        <option value="5">Error</option>
+        <option value="12">TemporaryPaid</option>
+        <option value="13">CannotPayPlayerLimitReached</option>
+        <option value="31">DeletedUnfinishedPayment</option>
+        <option value="32">DeletedFromCreated</option>
+    </select>
+    <input type="submit" value="Submit"/>
+</form>

@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Greentube.Test.ConsoleApp", "Greentube.Test.ConsoleApp\Greentube.Test.ConsoleApp.csproj", "{D06A9240-EEA6-4EAF-8AB0-FB1B2EC6A5C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcApplication", "MvcApplication\MvcApplication.csproj", "{8456DD9F-9B2C-45DF-9EC6-4176F816B54B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Example", "Akka.Example\Akka.Example.csproj", "{02550B93-4211-4FE7-86E3-B8F767ECFCA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Akka.Bootcamp", "Akka.Bootcamp.Unit1\Akka.Bootcamp.csproj", "{9326AE3B-FB7B-475B-8780-E92CB818D331}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D06A9240-EEA6-4EAF-8AB0-FB1B2EC6A5C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D06A9240-EEA6-4EAF-8AB0-FB1B2EC6A5C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D06A9240-EEA6-4EAF-8AB0-FB1B2EC6A5C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D06A9240-EEA6-4EAF-8AB0-FB1B2EC6A5C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8456DD9F-9B2C-45DF-9EC6-4176F816B54B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8456DD9F-9B2C-45DF-9EC6-4176F816B54B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8456DD9F-9B2C-45DF-9EC6-4176F816B54B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8456DD9F-9B2C-45DF-9EC6-4176F816B54B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02550B93-4211-4FE7-86E3-B8F767ECFCA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02550B93-4211-4FE7-86E3-B8F767ECFCA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02550B93-4211-4FE7-86E3-B8F767ECFCA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02550B93-4211-4FE7-86E3-B8F767ECFCA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9326AE3B-FB7B-475B-8780-E92CB818D331}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9326AE3B-FB7B-475B-8780-E92CB818D331}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9326AE3B-FB7B-475B-8780-E92CB818D331}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9326AE3B-FB7B-475B-8780-E92CB818D331}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
