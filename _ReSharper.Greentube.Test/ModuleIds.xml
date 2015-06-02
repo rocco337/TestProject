@@ -209,6 +209,7 @@
   <Module PersistentId="Microsoft.Transactions.Bridge, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, mvid=f6d25927-740c-4b3c-8661-01fb2b6106f8" ModuleId="Microsoft.Transactions.Bridge" />
   <Module PersistentId="Microsoft.VisualBasic.Activities.Compiler, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, mvid=6101da0d-dd70-48f0-8f72-745807fed623" ModuleId="Microsoft.VisualBasic.Activities.Compiler" />
   <Module PersistentId="System.Xaml.Hosting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, mvid=4109ee9c-ad54-41e1-a6d3-4b7d7bc91503" ModuleId="System.Xaml.Hosting" />
-  <Module PersistentId="9326AE3B-FB7B-475B-8780-E92CB818D331" ModuleId="Akka.Bootcamp.Unit1" />
-  <Module PersistentId="Akka, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null, mvid=bf67e82c-c98d-4628-9184-d24944e11d78" ModuleId="Akka_1" />
+  <Module PersistentId="Microsoft.VisualStudio.Web.PageInspector.Loader, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, mvid=db590beb-e61d-483f-afbb-a249eee8895f" ModuleId="Microsoft.VisualStudio.Web.PageInspector.Loader" />
+  <Module PersistentId="9326AE3B-FB7B-475B-8780-E92CB818D331" ModuleId="Akka.Bootcamp" />
+  <Module PersistentId="Akka, Version=1.0.1.0, Culture=neutral, mvid=bf67e82c-c98d-4628-9184-d24944e11d78" ModuleId="Akka_1" />
 </Modules>
