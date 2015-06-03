@@ -11,15 +11,16 @@ namespace Akka.Bootcamp.Unit1
         public ProccessUsage()
         {
             var system = ActorSystem.Create("ProcessUsageSystem");
+
             system.ActorOf<Logger>("Logger");
 
             var uiNotifier = system.ActorOf<UiNotifierActor>("notifyActor");
 
-            var someActor = system.ActorOf<ResourceRetrieverActor>("ResourceRetrieverActor");
+            var resourceRetrieverActor = system.ActorOf<ResourceRetrieverActor>("ResourceRetrieverActor");
 
-            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), someActor, RetrieverTypes.Cpu, uiNotifier);
-            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), someActor, RetrieverTypes.Hdd, uiNotifier);
-            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), someActor, RetrieverTypes.Memory, uiNotifier);
+            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), resourceRetrieverActor, RetrieverTypes.Cpu, uiNotifier);
+            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), resourceRetrieverActor, RetrieverTypes.Hdd, uiNotifier);
+            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), resourceRetrieverActor, RetrieverTypes.Memory, uiNotifier);
 
             system.AwaitTermination();
         }
