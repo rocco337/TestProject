@@ -16,7 +16,7 @@ namespace Akka.Bootcamp.Unit1
             var system = ActorSystem.Create("ProcessUsageSystem");
 
             system.ActorOf<Logger>("Logger");
-            system.ActorOf<AggregationActor>("Aggregation");
+            var aggregationActor = system.ActorOf<AggregationActor>("Aggregation");
 
             var uiNotifier = system.ActorOf<UiNotifierActor>("NotifyActor");
             var resourceRetrieverActor = system.ActorOf<ResourceRetrieverActor>("ResourceRetrieverActor");
@@ -33,6 +33,8 @@ namespace Akka.Bootcamp.Unit1
 
                 system.Scheduler.ScheduleTellRepeatedly(start, interval, resourceRetrieverActor, type, uiNotifier);
             }
+
+            system.Scheduler.ScheduleTellRepeatedly(start, TimeSpan.FromMilliseconds(2000), aggregationActor, new AggregationRequest(), uiNotifier);
 
             system.AwaitTermination();
         }
@@ -61,11 +63,6 @@ namespace Akka.Bootcamp.Unit1
 
         public string Unit { get; set; }
 
-        public override string ToString()
-        {
-            return string.Format("{0}: {1} {2}", Type, Usage, Unit);
-        }
-
         public RetrieverResponse(float usage, string unit, RetrieverTypes type)
         {
             Usage = usage;
@@ -88,7 +85,15 @@ namespace Akka.Bootcamp.Unit1
     {
         public RetrieverTypes Type { get; set; }
 
-        public float Value { get; set; }
+        public float Avg { get; set; }
+
+        public float Min { get; set; }
+
+        public float Max { get; set; }
+    }
+
+    public class AggregationRequest
+    {
     }
 
     #endregion Contracts
@@ -121,22 +126,26 @@ namespace Akka.Bootcamp.Unit1
         {
             var result = new StringBuilder();
             result.AppendLine(string.Empty);
-            foreach (var dashboardItem in _dashboard)
-            {
-                result.AppendLine(dashboardItem.Value.ToString());
-            }
-
-            result.AppendLine(string.Empty);
-            foreach (var dashboardItem in _dashboard)
-            {
-                var percent = (int)(dashboardItem.Value.Usage / 1.4);
-                result.AppendLine(string.Format("[{0}]:{1}", dashboardItem.Key, ".".Repeat(percent)));
-            }
-            result.AppendLine(string.Empty);
-
+            result.AppendLine("======================= AGGREGATED ========================");
             foreach (var item in _aggregation)
             {
-                result.AppendLine(string.Format("[{0}]:{1}", item.Key, item.Value.Value));
+                var avg = item.Value.Avg.ToString("n2");
+                var min = item.Value.Min.ToString("n2");
+                var max = item.Value.Max.ToString("n2");
+
+                result.AppendLine(string.Format("[{0,12}] - Avg: {1,7} - Min: {2,7} - Max: {3,7} ", item.Key, avg, min, max));
+            }
+
+            result.AppendLine(string.Empty);
+            result.AppendLine("======================= REALTIME ==========================");
+            result.AppendLine(string.Empty);
+            foreach (var dashboardItem in _dashboard)
+            {
+                var dotNumber = (int)(dashboardItem.Value.Usage * 0.5);
+                var usage = dashboardItem.Value.Usage.ToString("n2");
+                var percentage = string.Format("{0,5} {1}", usage, dashboardItem.Value.Unit);
+
+                result.AppendLine(string.Format("[{0,12}]: {1,50} {2}", dashboardItem.Key, ".".Repeat(dotNumber), percentage));
             }
             result.AppendLine(string.Empty);
 
@@ -215,22 +224,28 @@ namespace Akka.Bootcamp.Unit1
             Receive<RetrieverResponse>((response) =>
             {
                 _responses.Add(response);
+            });
 
-                if (_responses.Count > 50)
+            Receive<AggregationRequest>((request) =>
+            {
+                var responesToAggregate = _responses.ToArray();
+                //_responses.Clear();
+
+                var result = new AggregationResponse();
+
+                foreach (RetrieverTypes type in Enum.GetValues(typeof(RetrieverTypes)))
                 {
-                    var result = new AggregationResponse();
-
-                    foreach (RetrieverTypes type in Enum.GetValues(typeof(RetrieverTypes)))
+                    var usagesForType = responesToAggregate.Where(m => m.Type == type).ToList();
+                    result.Stats.Add(type, new AggreagtionDetails()
                     {
-                        result.Stats.Add(type, new AggreagtionDetails()
-                        {
-                            Type = type,
-                            Value = _responses.Where(m => m.Type == type).Average(m => m.Usage)
-                        });
-                    }
-                    _responses.Clear();
-                    Sender.Tell(result);
+                        Type = type,
+                        Avg = usagesForType.Any() ? usagesForType.Average(m => m.Usage) : 0,
+                        Min = usagesForType.Any() ? usagesForType.Min(m => m.Usage) : 0,
+                        Max = usagesForType.Any() ? usagesForType.Max(m => m.Usage) : 0
+                    });
                 }
+
+                Sender.Tell(result);
             });
         }
     }
