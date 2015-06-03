@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Text;
 
 namespace Akka.Bootcamp.Unit1
@@ -13,14 +16,23 @@ namespace Akka.Bootcamp.Unit1
             var system = ActorSystem.Create("ProcessUsageSystem");
 
             system.ActorOf<Logger>("Logger");
+            system.ActorOf<AggregationActor>("Aggregation");
 
-            var uiNotifier = system.ActorOf<UiNotifierActor>("notifyActor");
-
+            var uiNotifier = system.ActorOf<UiNotifierActor>("NotifyActor");
             var resourceRetrieverActor = system.ActorOf<ResourceRetrieverActor>("ResourceRetrieverActor");
 
-            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), resourceRetrieverActor, RetrieverTypes.Cpu, uiNotifier);
-            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), resourceRetrieverActor, RetrieverTypes.Hdd, uiNotifier);
-            system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), resourceRetrieverActor, RetrieverTypes.Memory, uiNotifier);
+            var start = TimeSpan.FromMilliseconds(0);
+            var interval = TimeSpan.FromMilliseconds(150);
+
+            foreach (RetrieverTypes type in Enum.GetValues(typeof(RetrieverTypes)))
+            {
+                if (type == RetrieverTypes.NetworkSpeed)
+                {
+                    interval = TimeSpan.FromMilliseconds(1000);
+                }
+
+                system.Scheduler.ScheduleTellRepeatedly(start, interval, resourceRetrieverActor, type, uiNotifier);
+            }
 
             system.AwaitTermination();
         }
@@ -32,7 +44,8 @@ namespace Akka.Bootcamp.Unit1
     {
         Cpu,
         Memory,
-        Hdd
+        Hdd,
+        NetworkSpeed
     }
 
     public interface IResourceRetriever
@@ -50,7 +63,7 @@ namespace Akka.Bootcamp.Unit1
 
         public override string ToString()
         {
-            return string.Format("{0} usage: {1} {2}", Type, Usage, Unit);
+            return string.Format("{0}: {1} {2}", Type, Usage, Unit);
         }
 
         public RetrieverResponse(float usage, string unit, RetrieverTypes type)
@@ -61,6 +74,23 @@ namespace Akka.Bootcamp.Unit1
         }
     }
 
+    public class AggregationResponse
+    {
+        public Dictionary<RetrieverTypes, AggreagtionDetails> Stats { get; set; }
+
+        public AggregationResponse()
+        {
+            Stats = new Dictionary<RetrieverTypes, AggreagtionDetails>();
+        }
+    }
+
+    public class AggreagtionDetails
+    {
+        public RetrieverTypes Type { get; set; }
+
+        public float Value { get; set; }
+    }
+
     #endregion Contracts
 
     #region actors
@@ -68,6 +98,7 @@ namespace Akka.Bootcamp.Unit1
     public class UiNotifierActor : ReceiveActor
     {
         private static Dictionary<RetrieverTypes, RetrieverResponse> _dashboard = new Dictionary<RetrieverTypes, RetrieverResponse>();
+        private static Dictionary<RetrieverTypes, AggreagtionDetails> _aggregation = new Dictionary<RetrieverTypes, AggreagtionDetails>();
 
         public UiNotifierActor()
         {
@@ -75,6 +106,13 @@ namespace Akka.Bootcamp.Unit1
             {
                 NotifyDashboard(response);
 
+                Context.ActorSelection("../Aggregation").Tell(response);
+                Context.ActorSelection("../Logger").Tell(response);
+            });
+
+            Receive<AggregationResponse>((response) =>
+            {
+                _aggregation = response.Stats;
                 Context.ActorSelection("../Logger").Tell(response);
             });
         }
@@ -93,6 +131,12 @@ namespace Akka.Bootcamp.Unit1
             {
                 var percent = (int)(dashboardItem.Value.Usage / 1.4);
                 result.AppendLine(string.Format("[{0}]:{1}", dashboardItem.Key, ".".Repeat(percent)));
+            }
+            result.AppendLine(string.Empty);
+
+            foreach (var item in _aggregation)
+            {
+                result.AppendLine(string.Format("[{0}]:{1}", item.Key, item.Value.Value));
             }
             result.AppendLine(string.Empty);
 
@@ -162,6 +206,35 @@ namespace Akka.Bootcamp.Unit1
         }
     }
 
+    public class AggregationActor : ReceiveActor
+    {
+        private List<RetrieverResponse> _responses = new List<RetrieverResponse>();
+
+        public AggregationActor()
+        {
+            Receive<RetrieverResponse>((response) =>
+            {
+                _responses.Add(response);
+
+                if (_responses.Count > 50)
+                {
+                    var result = new AggregationResponse();
+
+                    foreach (RetrieverTypes type in Enum.GetValues(typeof(RetrieverTypes)))
+                    {
+                        result.Stats.Add(type, new AggreagtionDetails()
+                        {
+                            Type = type,
+                            Value = _responses.Where(m => m.Type == type).Average(m => m.Usage)
+                        });
+                    }
+                    _responses.Clear();
+                    Sender.Tell(result);
+                }
+            });
+        }
+    }
+
     #endregion actors
 
     #region Retreivers
@@ -180,6 +253,9 @@ namespace Akka.Bootcamp.Unit1
 
                 case RetrieverTypes.Hdd:
                     return new HddRetriever();
+
+                case RetrieverTypes.NetworkSpeed:
+                    return new PingRetreiver();
 
                 default:
                     throw new NotSupportedException();
@@ -223,6 +299,23 @@ namespace Akka.Bootcamp.Unit1
             var usage = counter.NextValue();
 
             return new RetrieverResponse(usage, "%", type);
+        }
+    }
+
+    public class PingRetreiver : IResourceRetriever
+    {
+        public RetrieverResponse GetUsage(RetrieverTypes type)
+        {
+            Ping pingSender = new Ping();
+            IPAddress address = IPAddress.Parse("8.8.8.8");
+            PingReply reply = pingSender.Send(address);
+
+            if (reply.Status == IPStatus.Success)
+            {
+                return new RetrieverResponse(reply.RoundtripTime, "ms", RetrieverTypes.NetworkSpeed);
+            }
+
+            return new RetrieverResponse(0, "ms", RetrieverTypes.NetworkSpeed);
         }
     }
 

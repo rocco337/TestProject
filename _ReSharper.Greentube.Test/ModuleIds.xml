@@ -212,4 +212,6 @@
   <Module PersistentId="Microsoft.VisualStudio.Web.PageInspector.Loader, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, mvid=db590beb-e61d-483f-afbb-a249eee8895f" ModuleId="Microsoft.VisualStudio.Web.PageInspector.Loader" />
   <Module PersistentId="9326AE3B-FB7B-475B-8780-E92CB818D331" ModuleId="Akka.Bootcamp" />
   <Module PersistentId="Akka, Version=1.0.1.0, Culture=neutral, mvid=bf67e82c-c98d-4628-9184-d24944e11d78" ModuleId="Akka_1" />
+  <Module PersistentId="System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, mvid=556d2008-9903-4395-bbf7-9b0cd0f5c16c" ModuleId="System_4" />
+  <Module PersistentId="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, mvid=dbdbac68-6337-4444-bdb2-accaa2405af1" ModuleId="System.Core_4" />
 </Modules>
