@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Akka.Actor;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using Akka.Actor;
 
 namespace Akka.Bootcamp.Unit1
 {
@@ -11,15 +11,17 @@ namespace Akka.Bootcamp.Unit1
         public ProccessUsage()
         {
             var system = ActorSystem.Create("ProcessUsageSystem");
+            system.ActorOf<Logger>("Logger");
 
             var uiNotifier = system.ActorOf<UiNotifierActor>("notifyActor");
 
             var someActor = system.ActorOf<ResourceRetrieverActor>("ResourceRetrieverActor");
+
             system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), someActor, RetrieverTypes.Cpu, uiNotifier);
             system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), someActor, RetrieverTypes.Hdd, uiNotifier);
             system.Scheduler.ScheduleTellRepeatedly(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(150), someActor, RetrieverTypes.Memory, uiNotifier);
 
-            Console.ReadLine();
+            system.AwaitTermination();
         }
     }
 
@@ -40,7 +42,9 @@ namespace Akka.Bootcamp.Unit1
     public class RetrieverResponse
     {
         public RetrieverTypes Type { get; set; }
+
         public float Usage { get; set; }
+
         public string Unit { get; set; }
 
         public override string ToString()
@@ -56,18 +60,22 @@ namespace Akka.Bootcamp.Unit1
         }
     }
 
-    #endregion
+    #endregion Contracts
 
     #region actors
 
-    public class UiNotifierActor : UntypedActor
+    public class UiNotifierActor : ReceiveActor
     {
-        static Dictionary<RetrieverTypes, RetrieverResponse> _dashboard = new Dictionary<RetrieverTypes, RetrieverResponse>();
+        private static Dictionary<RetrieverTypes, RetrieverResponse> _dashboard = new Dictionary<RetrieverTypes, RetrieverResponse>();
 
-        protected override void OnReceive(object message)
+        public UiNotifierActor()
         {
-            var response = (RetrieverResponse)message;
-            NotifyDashboard(response);
+            Receive<RetrieverResponse>((response) =>
+            {
+                NotifyDashboard(response);
+
+                Context.ActorSelection("../Logger").Tell(response);
+            });
         }
 
         public static void DrawDashboard()
@@ -106,6 +114,45 @@ namespace Akka.Bootcamp.Unit1
         }
     }
 
+    public class Logger : ReceiveActor
+    {
+        private IActorRef debugLogger = Context.ActorOf<DebugLogger>("DebugLogger");
+        private IActorRef fileLogger = Context.ActorOf<DebugLogger>("FileLogger");
+
+        public Logger()
+        {
+            Receive<object>((value) =>
+            {
+                debugLogger.Tell(value);
+                fileLogger.Tell(value);
+            });
+        }
+    }
+
+    public class DebugLogger : ReceiveActor
+    {
+        public DebugLogger()
+        {
+            Receive<RetrieverResponse>((response) =>
+            {
+                Debug.WriteLine(response.ToString());
+            });
+        }
+    }
+
+    public class FileLogger : ReceiveActor
+    {
+        private List<string> _logFile = new List<string>();
+
+        public FileLogger()
+        {
+            Receive<RetrieverResponse>((response) =>
+            {
+                _logFile.Add(response.ToString());
+            });
+        }
+    }
+
     public class ResourceRetrieverActor : ReceiveActor
     {
         public ResourceRetrieverActor()
@@ -114,7 +161,7 @@ namespace Akka.Bootcamp.Unit1
         }
     }
 
-    #endregion
+    #endregion actors
 
     #region Retreivers
 
@@ -126,10 +173,13 @@ namespace Akka.Bootcamp.Unit1
             {
                 case RetrieverTypes.Cpu:
                     return new CpuRetriever();
+
                 case RetrieverTypes.Memory:
                     return new MemoryRetriever();
+
                 case RetrieverTypes.Hdd:
                     return new HddRetriever();
+
                 default:
                     throw new NotSupportedException();
             }
@@ -175,7 +225,7 @@ namespace Akka.Bootcamp.Unit1
         }
     }
 
-    #endregion
+    #endregion Retreivers
 
     #region Other
 
@@ -191,5 +241,6 @@ namespace Akka.Bootcamp.Unit1
             return builder.ToString();
         }
     }
-    #endregion
+
+    #endregion Other
 }
