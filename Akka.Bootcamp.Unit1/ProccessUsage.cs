@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Akka.Bootcamp.Unit1
@@ -133,7 +134,7 @@ namespace Akka.Bootcamp.Unit1
                 var min = item.Value.Min.ToString("n2");
                 var max = item.Value.Max.ToString("n2");
 
-                result.AppendLine(string.Format("[{0,12}] - Avg: {1,7} - Min: {2,7} - Max: {3,7} ", item.Key, avg, min, max));
+                result.AppendLine(string.Format("[{0,12}] - Avg: {1,7} - Max: {2,7} ", item.Key, avg, max));
             }
 
             result.AppendLine(string.Empty);
@@ -229,7 +230,6 @@ namespace Akka.Bootcamp.Unit1
             Receive<AggregationRequest>((request) =>
             {
                 var responesToAggregate = _responses.ToArray();
-                //_responses.Clear();
 
                 var result = new AggregationResponse();
 
@@ -240,7 +240,6 @@ namespace Akka.Bootcamp.Unit1
                     {
                         Type = type,
                         Avg = usagesForType.Any() ? usagesForType.Average(m => m.Usage) : 0,
-                        Min = usagesForType.Any() ? usagesForType.Min(m => m.Usage) : 0,
                         Max = usagesForType.Any() ? usagesForType.Max(m => m.Usage) : 0
                     });
                 }
@@ -295,12 +294,12 @@ namespace Akka.Bootcamp.Unit1
     {
         public RetrieverResponse GetUsage(RetrieverTypes type)
         {
-            var counter = new PerformanceCounter("Memory", "% Committed Bytes In Use", true);
-            counter.NextValue();
-            System.Threading.Thread.Sleep(100); // wait a second to get a valid reading
-            var usage = counter.NextValue();
+            Int64 phav = PerformanceInfo.GetPhysicalAvailableMemoryInMiB();
+            Int64 tot = PerformanceInfo.GetTotalMemoryInMiB();
+            decimal percentFree = ((decimal)phav / (decimal)tot) * 100;
+            int percentOccupied = (int)(100 - percentFree);
 
-            return new RetrieverResponse(usage, "%", type);
+            return new RetrieverResponse(percentOccupied, "%", type);
         }
     }
 
@@ -350,6 +349,61 @@ namespace Akka.Bootcamp.Unit1
             return builder.ToString();
         }
     }
+
+    public static class PerformanceInfo
+    {
+        [DllImport("psapi.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetPerformanceInfo([Out] out PerformanceInformation PerformanceInformation, [In] int Size);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PerformanceInformation
+        {
+            public int Size;
+            public IntPtr CommitTotal;
+            public IntPtr CommitLimit;
+            public IntPtr CommitPeak;
+            public IntPtr PhysicalTotal;
+            public IntPtr PhysicalAvailable;
+            public IntPtr SystemCache;
+            public IntPtr KernelTotal;
+            public IntPtr KernelPaged;
+            public IntPtr KernelNonPaged;
+            public IntPtr PageSize;
+            public int HandlesCount;
+            public int ProcessCount;
+            public int ThreadCount;
+        }
+
+        public static Int64 GetPhysicalAvailableMemoryInMiB()
+        {
+            PerformanceInformation pi = new PerformanceInformation();
+            if (GetPerformanceInfo(out pi, Marshal.SizeOf(pi)))
+            {
+                return Convert.ToInt64((pi.PhysicalAvailable.ToInt64() * pi.PageSize.ToInt64() / 1048576));
+            }
+            else
+            {
+                return -1;
+            }
+
+        }
+
+        public static Int64 GetTotalMemoryInMiB()
+        {
+            PerformanceInformation pi = new PerformanceInformation();
+            if (GetPerformanceInfo(out pi, Marshal.SizeOf(pi)))
+            {
+                return Convert.ToInt64((pi.PhysicalTotal.ToInt64() * pi.PageSize.ToInt64() / 1048576));
+            }
+            else
+            {
+                return -1;
+            }
+
+        }
+    }
+
 
     #endregion Other
 }
